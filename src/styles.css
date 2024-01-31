@@ -1,0 +1,58 @@
+.sidebar {
+width: 60px;
+transition: width 0.3s;
+}
+
+.sidebar.expanded {
+width: 200px;
+}
+
+.sidebar-handle {
+background-color: #f8f9fa;
+border-right: 1px solid #dee2e6;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+width: 60px;
+height: 100vh;
+}
+
+.sidebar.expanded .sidebar-handle {
+width: 200px;
+}
+
+.sidebar-handle svg {
+transition: transform 0.3s;
+}
+
+.sidebar.expanded .sidebar-handle svg {
+transform: rotate(180deg);
+}
+
+header {
+height: 40px;
+padding: 10px;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.map-container {
+    display: flex;
+    flex-direction: row; /* Important pour aligner les éléments en ligne */
+    flex: 1; /* Prend tout l'espace restant après le Header */
+}
+
+.poi-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Alignement vertical au centre */
+    align-items: center; /* Alignement horizontal au centre */
+    height: 100%;
+    width: 50%;
+  }
+  

@@ -1,0 +1,27 @@
+.marker-popup {
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);
+font-family: 'Roboto Mono', monospace;
+padding: 10px;
+border-radius: 3px;
+}
+
+.marker-name {
+font-size: 18px;
+font-weight: bold;
+}
+
+.marker-subheader {
+font-size: 16px;
+font-weight: bold;
+}
+
+.marker-description {
+font-size: 14px;
+}
+
+.marker-icon {
+background-color: #CCB46F;
+border: 1px solid black;
+border-radius: 20px;
+}

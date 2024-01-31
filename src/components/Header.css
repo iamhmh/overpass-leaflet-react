@@ -1,0 +1,10 @@
+/* Header.css */
+
+.header-container {
+background: #ffffff;
+padding: 10px;
+display: flex;
+align-items: center;
+font-family: 'Roboto Mono';
+height: 80px;
+}
