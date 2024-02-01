@@ -1,40 +1,53 @@
-import React, { useState, useEffect, useRef } from 'react';
-import L from 'leaflet';
-import { MapContainer, TileLayer, FeatureGroup, GeoJSON, Circle, Marker, Popup } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
-import Markers from './Markers';
+import React, { useState, useEffect, useRef } from "react";
+import L from "leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  GeoJSON,
+  Circle,
+  Marker,
+  Popup,
+} from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
+import Markers from "./Markers";
 
 function Map(props) {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [pois, setPois] = useState([]);
   const [polygon, setPolygon] = useState(null);
-  const [currentView, setCurrentView] = useState('FRANCE');
+  const [currentView, setCurrentView] = useState("FRANCE");
   const [departementsGeoJSON, setDepartementsGeoJSON] = useState(null);
   const [regionsGeoJSON, setRegionsGeoJSON] = useState(null);
-  const mapRef = useRef(); 
+  const mapRef = useRef();
   const parisCoordinates = [48.8566, 2.3522];
   const zoomLevel = 7;
 
+  // Fetch geojson data pour les régions et les départements
   useEffect(() => {
-    fetch('departements.geojson')
-      .then(response => response.json())
-      .then(data => setDepartementsGeoJSON(data))
-      .catch(error => console.error('Error loading departements geojson:', error));
-  
-    fetch('regions.geojson')
-      .then(response => response.json())
-      .then(data => setRegionsGeoJSON(data))
-      .catch(error => console.error('Error loading regions geojson:', error));
+    fetch("departements.geojson")
+      .then((response) => response.json())
+      .then((data) => setDepartementsGeoJSON(data))
+      .catch((error) =>
+        console.error("Error loading departements geojson:", error)
+      );
+
+    fetch("regions.geojson")
+      .then((response) => response.json())
+      .then((data) => setRegionsGeoJSON(data))
+      .catch((error) => console.error("Error loading regions geojson:", error));
   }, []);
-  
+
+  // lorsque le marker est cliqué, on récupère les données overpass
   const onMarkerClick = (marker) => {
     setSelectedMarker(marker);
     fetchOverpassData(marker.position);
   };
 
   const fetchOverpassData = (position) => {
+    // requête overpass pour récupérer les POIs
     const overpassQuery = `
     [out:json][timeout:25];
     (
@@ -50,39 +63,80 @@ function Map(props) {
       >;
       out skel qt;
     `;
-    
-    const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`;
 
+    // url de la requête overpass
+    const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
+      overpassQuery
+    )}`;
+
+    // recuperation des données overpass
     fetch(overpassUrl)
-      .then(response => response.json())
-      .then(data => {
-        const loadedPois = data.elements.map(el => {
-          const iconKey = el.tags.amenity || el.tags.highway || el.tags.railway || el.tags.leisure;
-          return { id: el.id, lat: el.lat, lng: el.lon, iconKey: iconKey, ...el.tags };
+      .then((response) => response.json())
+      .then((data) => {
+        const loadedPois = data.elements.map((el) => {
+          const iconKey =
+            el.tags.amenity ||
+            el.tags.highway ||
+            el.tags.railway ||
+            el.tags.leisure;
+          return {
+            id: el.id,
+            lat: el.lat,
+            lng: el.lon,
+            iconKey: iconKey,
+            ...el.tags,
+          };
         });
         setPois(loadedPois);
         props.setPois(loadedPois);
       })
-      .catch(error => console.error('Erreur lors du chargement des données Overpass:', error));
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données Overpass:", error)
+      );
   };
 
+  // icônes des POIs
   const poiIcons = {
-    "bus_stop": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/bus_stop.png', iconSize: [25, 25] }),
-    "tram_stop": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/tramway.png', iconSize: [25, 25] }),
-    "subway_entrance": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/subway.png', iconSize: [25, 25] }),
-    "bakery": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/bakery.png', iconSize: [25, 25] }),
-    "restaurant": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/restaurant.png', iconSize: [25, 25] }),
-    "supermarket": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/supermarket.png', iconSize: [25, 25] }),
-    "sports_centre": new L.Icon({ iconUrl: process.env.PUBLIC_URL + '/assets/poi-icons/sports.png', iconSize: [25, 25] }),
+    bus_stop: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/bus_stop.png",
+      iconSize: [25, 25],
+    }),
+    tram_stop: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/tramway.png",
+      iconSize: [25, 25],
+    }),
+    subway_entrance: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/subway.png",
+      iconSize: [25, 25],
+    }),
+    bakery: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/bakery.png",
+      iconSize: [25, 25],
+    }),
+    restaurant: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/restaurant.png",
+      iconSize: [25, 25],
+    }),
+    supermarket: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/supermarket.png",
+      iconSize: [25, 25],
+    }),
+    sports_centre: new L.Icon({
+      iconUrl: process.env.PUBLIC_URL + "/assets/poi-icons/sports.png",
+      iconSize: [25, 25],
+    }),
   };
+  const defaultIcon = new L.Icon({
+    iconUrl: "/path/to/default-icon.png",
+    iconSize: [25, 25],
+  });
 
-  const defaultIcon = new L.Icon({ iconUrl: '/path/to/default-icon.png', iconSize: [25, 25] });
-
+  // creation du polygone pour la selection de la zone
   const onCreated = (e) => {
     const { layer } = e;
     if (mapRef.current) {
       const map = mapRef.current;
-      map.fitBounds(layer.getBounds()); 
+      map.fitBounds(layer.getBounds());
 
       layer.remove();
       setPolygon(null);
@@ -108,67 +162,39 @@ function Map(props) {
   };
 
   return (
-    <div style={{ height: '100vh', width: '50%' }}>
-      <button onClick={() => setCurrentView('FRANCE')}>France</button>
-      <button onClick={() => setCurrentView('REGIONS')}>Régions</button>
-      <button onClick={() => setCurrentView('DEPARTEMENT')}>Départements</button>
-      <MapContainer
-        center={parisCoordinates}
-        zoom={zoomLevel}
-        style={{ height: '100%', width: '100%' }}
-        ref={mapRef}
-      >
+    <div style={{ height: "100vh", width: "50%" }}>
+      {/*Bouton de clique pour voir les zones*/}
+      <button onClick={() => setCurrentView("FRANCE")}>France</button>
+      <button onClick={() => setCurrentView("REGIONS")}>Régions</button>
+      <button onClick={() => setCurrentView("DEPARTEMENT")}>Départements</button>
+
+      {/*Map*/}
+      <MapContainer center={parisCoordinates} zoom={zoomLevel} style={{ height: "100%", width: "100%" }} ref={mapRef}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {currentView === 'REGIONS' && regionsGeoJSON && (
-          <GeoJSON data={regionsGeoJSON} onEachFeature={onEachFeature} />
-        )}
-        {currentView === 'DEPARTEMENT' && departementsGeoJSON && (
-          <GeoJSON data={departementsGeoJSON} onEachFeature={onEachFeature} />
-        )}
+        {currentView === "REGIONS" && regionsGeoJSON && (<GeoJSON data={regionsGeoJSON} onEachFeature={onEachFeature} />)}
+        {currentView === "DEPARTEMENT" && departementsGeoJSON && (<GeoJSON data={departementsGeoJSON} onEachFeature={onEachFeature} />)}
         <FeatureGroup>
-          <EditControl
-            position="topright"
-            onCreated={onCreated}
-            onEdited={onEdited}
-            onDeleted={onDeleted}
-            draw={{
-              rectangle: false,
-              polyline: false,
-              circle: false,
-              circlemarker: false,
-              marker: false,
-            }}
-          />
+          <EditControl position="topright" onCreated={onCreated} onEdited={onEdited} onDeleted={onDeleted} draw={{rectangle: false, polyline: false, circle: false, circlemarker: false, marker: false,}}/>
         </FeatureGroup>
         <Markers mapRef={mapRef} onMarkerClick={onMarkerClick} />
-        {selectedMarker && (
-          <Circle
-            center={selectedMarker.position}
-            radius={1000}
-            color="red"
-          />
-        )}
-          {pois.map(poi => {
-        const icon = poiIcons[poi.iconKey] || defaultIcon;
-        return (
-          <Marker 
-            key={poi.id} 
-            position={[poi.lat, poi.lng]}
-            icon={icon}
-          >
-            <Popup>
-              <div>
-                <strong>{poi.name || 'POI'}</strong><br/>
-                {poi.iconKey && <span>{poi.iconKey}</span>}
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
+        {selectedMarker && (<Circle center={selectedMarker.position} radius={1000} color="red" />)}
+        {pois.map((poi) => {
+          const icon = poiIcons[poi.iconKey] || defaultIcon;
+          return (
+            <Marker key={poi.id} position={[poi.lat, poi.lng]} icon={icon}>
+              <Popup>
+                <div>
+                  <strong>{poi.name || "POI"}</strong>
+                  <br />
+                  {poi.iconKey && <span>{poi.iconKey}</span>}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
-  
 }
 
 export default Map;

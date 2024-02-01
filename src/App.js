@@ -12,8 +12,8 @@ function App() {
     <div className='app-container'>
       <Header />
       <div className='map-container'>
-        <Map setPois={setPois} />
-        <POIStats pois={pois} />
+        <Map setPois={setPois} /> {/* Map */}
+        <POIStats pois={pois} /> {/* Stats à côté de la map */}
       </div>
     </div>
   );

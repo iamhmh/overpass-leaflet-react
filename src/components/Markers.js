@@ -6,13 +6,12 @@ import './Markers.css';
 
 // Define custom icon options
 const iconOptions = {
-  iconUrl: '../assets/icon_annonce.png',
+  iconUrl: process.env.PUBLIC_URL + '/assets/annonce/icon_annonce.png',
   iconSize: [20, 20],
 };
 
 // Create custom icon with the marker-icon class
-const customIcon = new Icon({ ...iconOptions, className: 'marker-icon'});
-
+const customIcon = new Icon({ ...iconOptions, className: 'marker-icon'}); 
 
 function Markers({ mapRef, onMarkerClick }) {
 
@@ -161,18 +160,18 @@ function Markers({ mapRef, onMarkerClick }) {
     <>
       {markersData.map((marker, index) => (
         <Marker 
-        key={index} 
-        position={marker.position} 
-        icon={customIcon}
-        eventHandlers={{
+        key={index} // clé unique de chaque marker
+        position={marker.position} // position du marker
+        icon={customIcon} // icone du marker
+        eventHandlers={{ // eventHandlers permet de gérer les évènements sur les markers
           click: () => onMarkerClick(marker),
         }}
       >
           <Popup>
             <div className="marker-popup">
-              <h4 className="marker-name">{marker.name}</h4>
-              <h5 className="marker-subheader">{marker.subHeader}</h5>
-              <p className="marker-description">{marker.description}</p>
+              <h4 className="marker-name">{marker.name}</h4> {/* nom du marker */}
+              <h5 className="marker-subheader">{marker.subHeader}</h5> {/* sous-titre du marker */}
+              <p className="marker-description">{marker.description}</p> {/* description du marker */}
             </div>
           </Popup>
           {/*createOverpassLayer(marker.position)*/}
